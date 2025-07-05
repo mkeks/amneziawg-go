@@ -11,7 +11,7 @@ require (
 	golang.org/x/net v0.41.0
 	golang.org/x/sys v0.33.0
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2
-	gvisor.dev/gvisor v0.0.0-20250606233247-e3c4c4cad86f
+	gvisor.dev/gvisor v0.0.0-20250428193742-2d800c3129d5
 )
 
 require (
