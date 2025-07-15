@@ -55,7 +55,7 @@ func parseTag(input string) (Tag, error) {
 	return tag, nil
 }
 
-func Parse(name, input string) (TagJunkPacketGenerator, error) {
+func ParseTagJunkGenerator(name, input string) (TagJunkPacketGenerator, error) {
 	inputSlice := strings.Split(input, "<")
 	if len(inputSlice) <= 1 {
 		return TagJunkPacketGenerator{}, fmt.Errorf("empty input: %s", input)
