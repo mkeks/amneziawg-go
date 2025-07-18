@@ -58,7 +58,7 @@ func ParseMagicHeader(key, value string) (MagicHeader, error) {
 }
 
 type MagicHeaders struct {
-	Values    []MagicHeader
+	Values          []MagicHeader
 	randomGenerator RandomNumberGenerator[uint32]
 }
 
