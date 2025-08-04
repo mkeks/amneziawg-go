@@ -205,18 +205,22 @@ func (device *Device) CreateMessageInitiation(peer *Peer) (*MessageInitiation, e
 
 	handshake.mixHash(handshake.remoteStatic[:])
 
-	device.awg.Mux.RLock()
-	msgType, err := device.awg.GetMsgType(DefaultMessageInitiationType)
-	if err != nil {
+	msgType := DefaultMessageInitiationType
+	if device.isAWG() {
+		device.awg.Mux.RLock()
+		msgType, err = device.awg.GetMsgType(DefaultMessageInitiationType)
+		if err != nil {
+			device.awg.Mux.RUnlock()
+			return nil, fmt.Errorf("get message type: %w", err)
+		}
+
 		device.awg.Mux.RUnlock()
-		return nil, fmt.Errorf("get message type: %w", err)
 	}
 
 	msg := MessageInitiation{
 		Type:      msgType,
 		Ephemeral: handshake.localEphemeral.publicKey(),
 	}
-	device.awg.Mux.RUnlock()
 
 	handshake.mixKey(msg.Ephemeral[:])
 	handshake.mixHash(msg.Ephemeral[:])
@@ -391,14 +395,19 @@ func (device *Device) CreateMessageResponse(peer *Peer) (*MessageResponse, error
 	}
 
 	var msg MessageResponse
-	device.awg.Mux.RLock()
-	msg.Type, err = device.awg.GetMsgType(DefaultMessageResponseType)
-	if err != nil {
+	if device.isAWG() {
+		device.awg.Mux.RLock()
+		msg.Type, err = device.awg.GetMsgType(DefaultMessageResponseType)
+		if err != nil {
+			device.awg.Mux.RUnlock()
+			return nil, fmt.Errorf("get message type: %w", err)
+		}
+
 		device.awg.Mux.RUnlock()
-		return nil, fmt.Errorf("get message type: %w", err)
+	} else {
+		msg.Type = DefaultMessageResponseType
 	}
 
-	device.awg.Mux.RUnlock()
 	msg.Sender = handshake.localIndex
 	msg.Receiver = handshake.remoteIndex
 

@@ -7,6 +7,15 @@ import (
 )
 
 func setUpJunkCreator() JunkCreator {
+	mh, _ := NewMagicHeaders(
+		[]MagicHeader{
+			NewMagicHeaderSameValue(123456),
+			NewMagicHeaderSameValue(67543),
+			NewMagicHeaderSameValue(32345),
+			NewMagicHeaderSameValue(123123),
+		},
+	)
+
 	jc := NewJunkCreator(Cfg{
 		IsSet:                  true,
 		JunkPacketCount:        5,
@@ -14,11 +23,7 @@ func setUpJunkCreator() JunkCreator {
 		JunkPacketMaxSize:      1000,
 		InitHeaderJunkSize:     30,
 		ResponseHeaderJunkSize: 40,
-		// TODO
-		// InitPacketMagicHeader:      123456,
-		// ResponsePacketMagicHeader:  67543,
-		// UnderloadPacketMagicHeader: 32345,
-		// TransportPacketMagicHeader: 123123,
+		MagicHeaders:           mh,
 	})
 
 	return jc
