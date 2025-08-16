@@ -3,24 +3,40 @@ name: build-if-tag
 on:
   push
 
+env:
+  APP: amneziawg-go
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Build ARM64 binary
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          ref: ${{ github.ref_name }}
 
-      - name: Build for ARM64
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ARM64 binary in container
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          platforms: linux/arm64
+          outputs: type=local,dest=./output
+
+      - name: Extract binary from output
         run: |
-          GOARCH=arm64 GOOS=linux go build -o amneziawg-go ./cmd
+          # Find the binary in the output directory
+          find ./output -name "${{ env.APP }}" -type f -executable | head -1 | xargs -I {} cp {} ./${{ env.APP }}-arm64
+          
+          # Verify the binary exists and show its info
+          ls -la ./${{ env.APP }}-arm64
+          file ./${{ env.APP }}-arm64
 
-      - name: Upload binary
+      - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: amneziawg-go-arm64
-          path: ./amneziawg-go
+          name: ${{ env.APP }}-arm64-binary
+          path: ./${{ env.APP }}-arm64
